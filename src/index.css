@@ -6,7 +6,20 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+.first-title {
+  border: dashed blueviolet;
+  margin: 10px;
+  font-size: 13px
+}
+.parent-div{
+  display: flex;
+  flex-direction: row;
+  gap: 100px;
+  margin: 10px
+}
+a{
+  text-decoration: none;
+}
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
