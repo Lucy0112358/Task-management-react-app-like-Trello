@@ -42,10 +42,13 @@ export default function TaskList({ task }) {
         onClick={() => closeModal()}
       >
         modal <br></br>
-        <div> <li>Title: {modal.title}</li>
-                <li>Done: {JSON.stringify(modal.completed)}</li>
-                <li>Task number {modal.id}</li>
-                <li>Project {modal.userId}</li></div>
+        <div>
+          {" "}
+          <li>Title: {modal.title}</li>
+          <li>Done: {JSON.stringify(modal.completed)}</li>
+          <li>Task number {modal.id}</li>
+          <li>Project {modal.userId}</li>
+        </div>
       </div>
       <div className="parent-div">
         <div>
