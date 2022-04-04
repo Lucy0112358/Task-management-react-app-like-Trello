@@ -1,10 +1,12 @@
 import React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Text, Grid, Card } from "@nextui-org/react";
 
-export default function TaskList({task}) {
+export default function TaskList({ task }) {
   const [tasks, setTasks] = useState([]);
-
+  const modalRef = useRef(null);
+  const [isModalOpen, setModal] = useState(true);
+  const [modal, setModalContent] = useState([]);
   useEffect(() => {
     fetch("https://jsonplaceholder.typicode.com/todos")
       .then((response) => response.json())
@@ -13,7 +15,15 @@ export default function TaskList({task}) {
         console.table(json);
       });
   }, []);
-  console.log(`tasklist ` +task)
+  const modalStyle = { display: `none` };
+  const closeModal = () => {
+    setModal(true);
+  };
+
+  const modalContent = (elem) => {
+    setModal(false);
+    tasks.map((item) => (item.id === elem ? setModalContent(item) : null));
+  };
   return (
     <div>
       <Text
@@ -26,38 +36,42 @@ export default function TaskList({task}) {
       >
         Project {task}
       </Text>
-<div className="parent-div">
-  <div>
-      <Text color="#ff4ecd">To do</Text>
-      {tasks.map(({ userId, completed, id, title }) =>
-        userId === parseInt(task) && completed === false ? (
-          <div className="first-title">
-            <li>Title: {title}</li>
-            <li>Status: to do</li>
-            <li>Task number {id}</li>
-            <li>Project {userId}</li>
-          </div>
-        ) : (
-          console.log(1)
-        )
-      )}
+      <div
+        ref={modalRef}
+        style={isModalOpen ? modalStyle : null}
+        onClick={() => closeModal()}
+      >
+        modal <br></br>
+        {console.log(modal)}
       </div>
-      <div >
-      <Text color="primary">Completed</Text>
-      {tasks.map(({ userId, completed, title, id }) =>
-        userId === parseInt(task) && completed === true ? (
-          <div className="first-title">
-            {" "}
-            <li>Title:  {title}</li>
-            <li>Status: Done</li>
-            <li>Task number {id}</li>
-            <li>Project {userId}</li>
-          </div>
-        ) : (
-          console.log(1)
-        )
-      )}
-      </div>
+      <div className="parent-div">
+        <div>
+          <Text color="#ff4ecd">To do</Text>
+          {tasks.map(({ userId, completed, id, title }) =>
+            userId === parseInt(task) && completed === false ? (
+              <div className="first-title" onClick={() => modalContent(id)}>
+                <li>Title: {title}</li>
+                <li>Status: to do</li>
+                <li>Task number {id}</li>
+                <li>Project {userId}</li>
+              </div>
+            ) : null
+          )}
+        </div>
+        <div>
+          <Text color="primary">Completed</Text>
+          {tasks.map(({ userId, completed, title, id }) =>
+            userId === parseInt(task) && completed === true ? (
+              <div className="first-title" onClick={() => modalContent(id)}>
+                {" "}
+                <li>Title: {title}</li>
+                <li>Status: Done</li>
+                <li>Task number {id}</li>
+                <li>Project {userId}</li>
+              </div>
+            ) : null
+          )}
+        </div>
       </div>
     </div>
   );
