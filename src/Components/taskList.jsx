@@ -1,10 +1,10 @@
 import React from "react";
-import { useEffect, useState, useRef } from "react";
-import { Text, Grid, Card } from "@nextui-org/react";
+import { useEffect, useState } from "react";
+import { Text } from "@nextui-org/react";
+import Modal from "./Modal.jsx";
 
 export default function TaskList({ task }) {
   const [tasks, setTasks] = useState([]);
-  const modalRef = useRef(null);
   const [isModalOpen, setModal] = useState(true);
   const [modal, setModalContent] = useState([]);
   useEffect(() => {
@@ -15,15 +15,13 @@ export default function TaskList({ task }) {
         console.table(json);
       });
   }, []);
-  const modalStyle = { display: `none` };
-  const closeModal = () => {
-    setModal(true);
-  };
 
   const modalContent = (elem) => {
     setModal(false);
     tasks.map((item) => (item.id === elem ? setModalContent(item) : null));
+    console.log(modal);
   };
+  const modalStyle = { display: `none` };
   return (
     <div>
       <Text
@@ -33,23 +31,19 @@ export default function TaskList({ task }) {
           textGradient: "45deg, $blue500 -20%, $pink500 50%",
         }}
         weight="bold"
+        onClick={() => setModal(true)}
       >
         Project {task}
       </Text>
-      <div
-        ref={modalRef}
-        style={isModalOpen ? modalStyle : null}
-        onClick={() => closeModal()}
-      >
-        modal <br></br>
-        <div>
-          {" "}
-          <li>Title: {modal.title}</li>
-          <li>Done: {JSON.stringify(modal.completed)}</li>
-          <li>Task number {modal.id}</li>
-          <li>Project {modal.userId}</li>
-        </div>
-      </div>
+      {!isModalOpen && (
+        <Modal
+          isModalOpen={isModalOpen}
+          setModal={setModal}
+          modal={modal}
+          modalStyle={modalStyle}
+        />
+      )}
+      <button onClick={() => setModal(true)}>Close modal</button>
       <div className="parent-div">
         <div>
           <Text color="#ff4ecd">To do</Text>
