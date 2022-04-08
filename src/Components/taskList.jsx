@@ -22,6 +22,9 @@ export default function TaskList({ task }) {
     console.log(modal);
   };
   const modalStyle = { display: `none` };
+  const removeTask = (item) => {
+    setTasks((prev) => prev.filter((element) => element.id !== item.id));
+  };
   return (
     <div>
       <Text
@@ -36,24 +39,35 @@ export default function TaskList({ task }) {
         Project {task}
       </Text>
       {!isModalOpen && (
-        <Modal
-          isModalOpen={isModalOpen}
-          setModal={setModal}
-          modal={modal}
-          modalStyle={modalStyle}
-        />
+        <div>
+          <Modal
+            isModalOpen={isModalOpen}
+            setModal={setModal}
+            modal={modal}
+            modalStyle={modalStyle}
+            setModalContent={setModalContent}
+            tasks={tasks}
+            setTasks={setTasks}
+          />
+          <button onClick={() => setModal(true)}>Close modal</button>
+        </div>
       )}
-      <button onClick={() => setModal(true)}>Close modal</button>
+
       <div className="parent-div">
         <div>
           <Text color="#ff4ecd">To do</Text>
-          {tasks.map(({ userId, completed, id, title }) =>
-            userId === parseInt(task) && completed === false ? (
-              <div className="first-title" onClick={() => modalContent(id)}>
-                <li>Title: {title}</li>
+          <button>Add a task</button>
+          {tasks.map((task1) =>
+            task1.userId === parseInt(task) && task1.completed === false ? (
+              <div
+                className="first-title"
+                onClick={() => modalContent(task1.id)}
+              >
+                <li>Title: {task1.title}</li>
                 <li>Status: to do</li>
-                <li>Task number {id}</li>
-                <li>Project {userId}</li>
+                <li>Task number {task1.id}</li>
+                <li>Project {task1.userId}</li>
+                <button onClick={() => removeTask(task1)}>Delete task</button>
               </div>
             ) : null
           )}
@@ -68,6 +82,7 @@ export default function TaskList({ task }) {
                 <li>Status: Done</li>
                 <li>Task number {id}</li>
                 <li>Project {userId}</li>
+                <button>Delete task</button>
               </div>
             ) : null
           )}
