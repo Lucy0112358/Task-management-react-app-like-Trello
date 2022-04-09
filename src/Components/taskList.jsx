@@ -5,7 +5,7 @@ import Modal from "./Modal.jsx";
 
 export default function TaskList({ task }) {
   const [tasks, setTasks] = useState([]);
-  const [isModalOpen, setModal] = useState(true);
+  const [isModalOpen, setModal] = useState(false);
   const [modal, setModalContent] = useState([]);
   useEffect(() => {
     fetch("https://jsonplaceholder.typicode.com/todos")
