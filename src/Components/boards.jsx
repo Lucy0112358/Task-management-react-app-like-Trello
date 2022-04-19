@@ -2,14 +2,14 @@ import React, { useState } from "react";
 
 import { Link } from "react-router-dom";
 export default function Boards({ task, setTask }) {
-  const boards = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const boards = ["Javascript", "React.js", "Quality assurance", "Chess lesson", "Clean room"];
   const [board] = useState(boards);
 
   return (
     <div>
       {board.map((item) => (
         <li>
-          Project{" "}
+          Project{" "} 
           <Link
             to={"/tasklist"}
             key={item}

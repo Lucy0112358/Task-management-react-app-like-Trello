@@ -2,29 +2,38 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { Text } from "@nextui-org/react";
 import Modal from "./Modal.jsx";
+import Addtask from "./Addtask";
+import { db } from "../firebase-conf/index";
+import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 
 export default function TaskList({ task }) {
+  const records = collection(db, "tasks");
   const [tasks, setTasks] = useState([]);
   const [isModalOpen, setModal] = useState(false);
   const [modal, setModalContent] = useState([]);
+  const [addnewtask, setAddnewtask] = useState(false);
+
   useEffect(() => {
-    fetch("https://jsonplaceholder.typicode.com/todos")
-      .then((response) => response.json())
-      .then((json) => {
-        setTasks(json);
-        console.table(json);
-      });
+    const asyncronous = async () => {
+      const data = await getDocs(records);
+      setTasks(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+      console.log(tasks);
+    };
+    asyncronous();
   }, []);
 
   const modalContent = (elem) => {
-    setModal(false);
+    setModal(true);
     tasks.map((item) => (item.id === elem ? setModalContent(item) : null));
     console.log(modal);
   };
+  
   const modalStyle = { display: `none` };
-  const removeTask = (item) => {
-    setTasks((prev) => prev.filter((element) => element.id !== item.id));
+  const removeTask = async (id) => {    
+    const itemToDelete = doc(db, "tasks", id);
+    await deleteDoc(itemToDelete);
   };
+
   return (
     <div>
       <Text
@@ -38,7 +47,7 @@ export default function TaskList({ task }) {
       >
         Project {task}
       </Text>
-      {!isModalOpen && (
+      {isModalOpen && (
         <div>
           <Modal
             isModalOpen={isModalOpen}
@@ -48,44 +57,89 @@ export default function TaskList({ task }) {
             setModalContent={setModalContent}
             tasks={tasks}
             setTasks={setTasks}
+            db={db}
           />
-          <button onClick={() => setModal(true)}>Close modal</button>
+          <button onClick={() => setModal(false)}>Close modal</button>
         </div>
       )}
 
       <div className="parent-div">
         <div>
           <Text color="#ff4ecd">To do</Text>
-          <button>Add a task</button>
+          <button onClick={() => setAddnewtask(true)}>Add a task</button>
+          {addnewtask && (
+            <Addtask
+              records={records}
+              task={task}
+              tasks={tasks}
+              setTasks={setTasks}
+              setAddnewtask={setAddnewtask}
+            />
+          )}
           {tasks.map((task1) =>
-            task1.userId === parseInt(task) && task1.completed === false ? (
-              <div
-                className="first-title"
-                onClick={() => modalContent(task1.id)}
-              >
-                <li>Title: {task1.title}</li>
-                <li>Status: to do</li>
-                <li>Task number {task1.id}</li>
-                <li>Project {task1.userId}</li>
-                <button onClick={() => removeTask(task1)}>Delete task</button>
+            task1.category === task && task1.status === `todo` ? (
+              <div className="first-title">
+                <li onClick={() => modalContent(task1.id)}>
+                  Title: {task1.title}
+                </li>
+                <li onClick={() => modalContent(task1.id)}>
+                  Status: {task1.status}
+                </li>
+                <li onClick={() => modalContent(task1.id)}>
+                  Task number {task1.id}
+                </li>
+                <li onClick={() => modalContent(task1.id)}>
+                  Project {task1.category}
+                </li>
+                <button onClick={() => removeTask(task1.id)}>
+                  Delete task
+                </button>
               </div>
             ) : null
           )}
         </div>
+
         <div>
-          <Text color="primary">Completed</Text>
-          {tasks.map(({ userId, completed, title, id }) =>
-            userId === parseInt(task) && completed === true ? (
-              <div className="first-title" onClick={() => modalContent(id)}>
-                {" "}
-                <li>Title: {title}</li>
-                <li>Status: Done</li>
-                <li>Task number {id}</li>
-                <li>Project {userId}</li>
-                <button>Delete task</button>
+          <Text color="#ff4ecd">Doing</Text>
+
+          {tasks.map((task1) =>
+            task1.category === task && task1.status === `doing` ? (
+              <div className="first-title">
+                <li onClick={() => modalContent(task1.id)}>
+                  Title: {task1.title}
+                </li>
+                <li onClick={() => modalContent(task1.id)}>
+                  Status: {task1.status}
+                </li>
+                <li onClick={() => modalContent(task1.id)}>
+                  Task number {task1.id}
+                </li>
+                <li onClick={() => modalContent(task1.id)}>
+                  Project {task1.category}
+                </li>
+                <button onClick={() => removeTask(task1.id)}>
+                  Delete task
+                </button>
               </div>
             ) : null
           )}
+        </div>
+
+        <div>
+          <Text color="primary">Completed</Text>
+          {tasks.map((taskItem) => {
+            const { category, status, title, id } = taskItem;
+            return category === task && status === `done` ? (
+              <div className="first-title">
+                {" "}
+                <li onClick={() => modalContent(id)}>Title: {title}</li>
+                <li onClick={() => modalContent(id)}>Status: {category}</li>
+                <li onClick={() => modalContent(id)}>Task number {id}</li>
+                <li onClick={() => modalContent(id)}>Project {category}</li>
+                <button onClick={() => removeTask(id)}>Delete task</button>
+              </div>
+            ) : null;
+          })}
         </div>
       </div>
     </div>
