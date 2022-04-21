@@ -7,6 +7,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import TaskList from "./Components/taskList";
 import Boards from "./Components/boards";
 import OneTask from "./Components/oneTask";
+import RegistrationForm from "./Components/RegistrationForm";
+import Logout from "./Components/Logout";
+
 function App() {
   const [isLoggedIn] = useState(getStorage() || false);
   const [task, setTask] = useState(`test`);
@@ -25,6 +28,8 @@ function App() {
           />
           <Route path="/tasklist" element={<TaskList task={task} />} />
           <Route path="/oneTask" element={<OneTask />} />
+          <Route path="/signup" element={<RegistrationForm />} />
+          <Route path="/logout" element={<Logout />} />
         </Routes>
       </BrowserRouter>
     </>

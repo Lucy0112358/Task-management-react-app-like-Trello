@@ -5,6 +5,7 @@ import Modal from "./Modal.jsx";
 import Addtask from "./Addtask";
 import { db } from "../firebase-conf/index";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
+import { Loading } from "@nextui-org/react";
 
 export default function TaskList({ task }) {
   const records = collection(db, "tasks");
@@ -12,13 +13,14 @@ export default function TaskList({ task }) {
   const [isModalOpen, setModal] = useState(false);
   const [modal, setModalContent] = useState([]);
   const [addnewtask, setAddnewtask] = useState(false);
-
+  const [loader, setLoader] = useState(true);
   useEffect(() => {
     const asyncronous = async () => {
       const data = await getDocs(records);
       setTasks(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-      console.log(tasks);
+      setLoader(false);
     };
+
     asyncronous();
   }, []);
 
@@ -27,9 +29,9 @@ export default function TaskList({ task }) {
     tasks.map((item) => (item.id === elem ? setModalContent(item) : null));
     console.log(modal);
   };
-  
+
   const modalStyle = { display: `none` };
-  const removeTask = async (id) => {    
+  const removeTask = async (id) => {
     const itemToDelete = doc(db, "tasks", id);
     await deleteDoc(itemToDelete);
   };
@@ -101,7 +103,7 @@ export default function TaskList({ task }) {
 
         <div>
           <Text color="#ff4ecd">Doing</Text>
-
+          {loader &&  <Loading color="error" textColor="error" className="input-divs"> Amazing data! </Loading>}
           {tasks.map((task1) =>
             task1.category === task && task1.status === `doing` ? (
               <div className="first-title">
