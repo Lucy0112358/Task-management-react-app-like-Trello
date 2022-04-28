@@ -34,8 +34,8 @@ export default function RegistrationForm() {
         visibleIcon={<UnLockIcon fill="currentColor" />}
         hiddenIcon={<LockIcon fill="currentColor" />}
       />
-     <Link  to={"/"}>
-      <button onClick={makeNewUser}>Sign Up</button>
+      <Link to={"/"}>
+        <button onClick={makeNewUser}>Sign Up</button>
       </Link>
     </div>
   );

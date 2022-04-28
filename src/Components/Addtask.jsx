@@ -1,28 +1,28 @@
 import React, { useState } from "react";
 import Input from "./Input";
 import { addDoc } from "firebase/firestore";
-import { toBeInTheDocument } from "@testing-library/jest-dom/dist/matchers";
-export default function Addtask({
-  setTasks,
-  records,
-  setAddnewtask,
-  tasks,
-  task,
-}) {
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase-conf/index";
+export default function Addtask({ records, setAddnewtask, tasks, tabname }) {
   const [title, setTitile] = useState(``);
   const [description, setDescription] = useState(``);
   const [priority, setPriority] = useState(``);
+  const [user, setUser] = useState({});
+  onAuthStateChanged(auth, (currentUser) => {
+    setUser(currentUser);
+  });
   const addnewtask = async () => {
     setAddnewtask(false);
-    if(title && description && priority){
-    await addDoc(records, {
-      category: task,
-      title: title,
-      description: description,
-      status: `todo`,
-      priority: priority,
-    });
-   }
+    if (title && description && priority) {
+      await addDoc(records, {
+        category: tabname,
+        title: title,
+        description: description,
+        status: `todo`,
+        priority: priority,
+        userID: user.uid,
+      });
+    }
     console.log(tasks);
   };
 

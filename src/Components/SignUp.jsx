@@ -1,11 +1,7 @@
 import { React, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { auth } from "../firebase-conf/index";
-import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signOut,
-} from "firebase/auth";
+import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import { Input, Spacer, Loading } from "@nextui-org/react";
 import { UnLockIcon } from "./UnLockIcon.js";
 import { LockIcon } from "./LockIcon.js";
@@ -21,6 +17,7 @@ export default function SignUp() {
   });
 
   const signInUser = async () => {
+
     setLoader(true);
     try {
       await signInWithEmailAndPassword(
@@ -28,16 +25,15 @@ export default function SignUp() {
         email.current.value,
         password.current.value
       );
-
+      console.log();
       goToPage.current.click();
     } catch (error) {
       alert(error.message);
     }
     setLoader(false);
+  
   };
-  const signOutUser = async () => {
-    signOut(auth);
-  };
+
   return (
     <div className="input-divs">
       {/* <input ref={email} /> */}
@@ -56,12 +52,10 @@ export default function SignUp() {
       />
 
       {/* <input ref={password} /> */}
-      {user?.email && <div> Account of user</div>}
+      {user?.email && <div> Account of user {user?.email}</div>}
+
       <Link ref={goToPage} to={"/boards"}></Link>
-      {user?.email}
-      
       <button onClick={signInUser}>Sign In</button>
-      <button onClick={signOutUser}>Sign Out</button>
     </div>
   );
 }

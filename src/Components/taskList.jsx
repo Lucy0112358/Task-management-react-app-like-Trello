@@ -1,37 +1,59 @@
 import React from "react";
+import { useParams } from "react-router";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Text } from "@nextui-org/react";
 import Modal from "./Modal.jsx";
 import Addtask from "./Addtask";
 import { db } from "../firebase-conf/index";
-import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
-import { Loading } from "@nextui-org/react";
 
+import {
+  collection,
+  getDocs,
+  doc,
+  deleteDoc,
+  query,
+  where,
+} from "firebase/firestore";
+import { Loading } from "@nextui-org/react";
+import Logout from "./Logout";
+import getStorage from "../helpers/getStorage.js";
 export default function TaskList({ task }) {
   const records = collection(db, "tasks");
   const [tasks, setTasks] = useState([]);
   const [isModalOpen, setModal] = useState(false);
   const [modal, setModalContent] = useState([]);
   const [addnewtask, setAddnewtask] = useState(false);
-  const [loader, setLoader] = useState(true);
-  useEffect(() => {
-    const asyncronous = async () => {
-      const data = await getDocs(records);
-      setTasks(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-      setLoader(false);
-    };
+  const [loader, setLoader] = useState(false);
 
-    asyncronous();
+  let params = useParams();
+  let tabname = params.id;
+
+  const q = query(records, where(`userID`, `==`, getStorage(`isLoggedIn`)));
+  useEffect(() => {
+    try {
+      setLoader(true);
+      const asyncronous = async () => {
+        const data = await getDocs(q);
+        setTasks(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+      };
+      asyncronous();
+    } catch {
+      alert(`error`);
+    }
+    setLoader(false);
   }, []);
 
   const modalContent = (elem) => {
     setModal(true);
-    tasks.map((item) => (item.id === elem ? setModalContent(item) : null));
-    console.log(modal);
+    tasks.map((item) => (item.id === elem ? setModalContent(item) : 1));
   };
 
   const modalStyle = { display: `none` };
-  const removeTask = async (id) => {
+
+  const removeTask = async (e, id) => {
+    console.log(e, id);
+    e.stopPropagation();
     const itemToDelete = doc(db, "tasks", id);
     await deleteDoc(itemToDelete);
   };
@@ -47,8 +69,9 @@ export default function TaskList({ task }) {
         weight="bold"
         onClick={() => setModal(true)}
       >
-        Project {task}
+        Project {tabname}
       </Text>
+      <Logout />
       {isModalOpen && (
         <div>
           <Modal
@@ -72,40 +95,43 @@ export default function TaskList({ task }) {
           {addnewtask && (
             <Addtask
               records={records}
-              task={task}
+              tabname={tabname}
               tasks={tasks}
               setTasks={setTasks}
               setAddnewtask={setAddnewtask}
             />
           )}
           {tasks.map((task1) =>
-            task1.category === task && task1.status === `todo` ? (
-              <div className="first-title">
-                <li onClick={() => modalContent(task1.id)}>
-                  Title: {task1.title}
-                </li>
-                <li onClick={() => modalContent(task1.id)}>
-                  Status: {task1.status}
-                </li>
-                <li onClick={() => modalContent(task1.id)}>
-                  Task number {task1.id}
-                </li>
-                <li onClick={() => modalContent(task1.id)}>
-                  Project {task1.category}
-                </li>
-                <button onClick={() => removeTask(task1.id)}>
-                  Delete task
-                </button>
-              </div>
+            task1.category === tabname && task1.status === `todo` ? (
+              <Link to={`/boards/${tabname}/${task1.id}`}>
+                {" "}
+                <div
+                  className="first-title"
+                  onClick={() => modalContent(task1.id)}
+                >
+                  <li>Title: {task1.title}</li>
+                  <li>Status: {task1.status}</li>
+                  <li>Task number {task1.id}</li>
+                  <li>Project {task1.category}</li>
+                  <button onClick={(e) => removeTask(e, task1.id)}>
+                    Delete task
+                  </button>
+                </div>
+              </Link>
             ) : null
           )}
         </div>
 
         <div>
           <Text color="#ff4ecd">Doing</Text>
-          {loader &&  <Loading color="error" textColor="error" className="input-divs"> Amazing data! </Loading>}
+          {loader && (
+            <Loading color="error" textColor="error" className="input-divs">
+              {" "}
+              Amazing data!{" "}
+            </Loading>
+          )}
           {tasks.map((task1) =>
-            task1.category === task && task1.status === `doing` ? (
+            task1.category === tabname && task1.status === `doing` ? (
               <div className="first-title">
                 <li onClick={() => modalContent(task1.id)}>
                   Title: {task1.title}
@@ -130,14 +156,14 @@ export default function TaskList({ task }) {
         <div>
           <Text color="primary">Completed</Text>
           {tasks.map((taskItem) => {
-            const { category, status, title, id } = taskItem;
-            return category === task && status === `done` ? (
-              <div className="first-title">
+            const { category, status, title, id, userID } = taskItem;
+            return category === tabname && status === `done` ? (
+              <div className="first-title" onClick={() => modalContent(id)}>
                 {" "}
                 <li onClick={() => modalContent(id)}>Title: {title}</li>
                 <li onClick={() => modalContent(id)}>Status: {category}</li>
-                <li onClick={() => modalContent(id)}>Task number {id}</li>
-                <li onClick={() => modalContent(id)}>Project {category}</li>
+                <li>Task number {id}</li>
+                <li>Project {category}</li>
                 <button onClick={() => removeTask(id)}>Delete task</button>
               </div>
             ) : null;
