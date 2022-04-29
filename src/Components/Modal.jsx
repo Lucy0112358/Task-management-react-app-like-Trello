@@ -6,7 +6,7 @@ import { doc, updateDoc } from "firebase/firestore";
 export default function Modal({ db, modal, setModal, tasks }) {
   const input = useRef(null);
   const { singleTask } = useParams();
-  console.log(tasks, 44444);
+
   const editTitle = async ({ id, title }) => {
     const taskTitle = doc(db, "tasks", id);
     await updateDoc(taskTitle, { title: input.current.value });

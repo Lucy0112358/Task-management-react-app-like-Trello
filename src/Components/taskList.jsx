@@ -1,6 +1,5 @@
 import React from "react";
-import { useParams } from "react-router";
-import { Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import { Text } from "@nextui-org/react";
 import Modal from "./Modal.jsx";
@@ -18,14 +17,14 @@ import {
 import { Loading } from "@nextui-org/react";
 import Logout from "./Logout";
 import getStorage from "../helpers/getStorage.js";
-export default function TaskList({ task }) {
+export default function TaskList({ task, setModal, isModalOpen }) {
   const records = collection(db, "tasks");
   const [tasks, setTasks] = useState([]);
-  const [isModalOpen, setModal] = useState(false);
+
   const [modal, setModalContent] = useState([]);
   const [addnewtask, setAddnewtask] = useState(false);
   const [loader, setLoader] = useState(false);
-
+  const navigate = useNavigate();
   let params = useParams();
   let tabname = params.id;
 
@@ -45,6 +44,7 @@ export default function TaskList({ task }) {
   }, []);
 
   const modalContent = (elem) => {
+    //navigate(`/boards/${tabname}/${elem}`);
     setModal(true);
     tasks.map((item) => (item.id === elem ? setModalContent(item) : 1));
   };
@@ -52,8 +52,8 @@ export default function TaskList({ task }) {
   const modalStyle = { display: `none` };
 
   const removeTask = async (e, id) => {
-    console.log(e, id);
     e.stopPropagation();
+    console.log(e, id);
     const itemToDelete = doc(db, "tasks", id);
     await deleteDoc(itemToDelete);
   };
@@ -103,21 +103,18 @@ export default function TaskList({ task }) {
           )}
           {tasks.map((task1) =>
             task1.category === tabname && task1.status === `todo` ? (
-              <Link to={`/boards/${tabname}/${task1.id}`}>
-                {" "}
-                <div
-                  className="first-title"
-                  onClick={() => modalContent(task1.id)}
-                >
-                  <li>Title: {task1.title}</li>
-                  <li>Status: {task1.status}</li>
-                  <li>Task number {task1.id}</li>
-                  <li>Project {task1.category}</li>
-                  <button onClick={(e) => removeTask(e, task1.id)}>
-                    Delete task
-                  </button>
-                </div>
-              </Link>
+              <div
+                className="first-title"
+                onClick={() => modalContent(task1.id)}
+              >
+                <li>Title: {task1.title}</li>
+                <li>Status: {task1.status}</li>
+                <li>Task number {task1.id}</li>
+                <li>Project {task1.category}</li>
+                <button onClick={(e) => removeTask(e, task1.id)}>
+                  Delete task
+                </button>
+              </div>
             ) : null
           )}
         </div>
@@ -156,7 +153,7 @@ export default function TaskList({ task }) {
         <div>
           <Text color="primary">Completed</Text>
           {tasks.map((taskItem) => {
-            const { category, status, title, id, userID } = taskItem;
+            const { category, status, title, id } = taskItem;
             return category === tabname && status === `done` ? (
               <div className="first-title" onClick={() => modalContent(id)}>
                 {" "}
