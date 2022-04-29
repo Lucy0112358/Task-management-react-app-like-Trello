@@ -44,7 +44,6 @@ export default function TaskList({ task, setModal, isModalOpen }) {
   }, []);
 
   const modalContent = (elem) => {
-    //navigate(`/boards/${tabname}/${elem}`);
     setModal(true);
     tasks.map((item) => (item.id === elem ? setModalContent(item) : 1));
   };
@@ -129,19 +128,14 @@ export default function TaskList({ task, setModal, isModalOpen }) {
           )}
           {tasks.map((task1) =>
             task1.category === tabname && task1.status === `doing` ? (
-              <div className="first-title">
-                <li onClick={() => modalContent(task1.id)}>
-                  Title: {task1.title}
-                </li>
-                <li onClick={() => modalContent(task1.id)}>
-                  Status: {task1.status}
-                </li>
-                <li onClick={() => modalContent(task1.id)}>
-                  Task number {task1.id}
-                </li>
-                <li onClick={() => modalContent(task1.id)}>
-                  Project {task1.category}
-                </li>
+              <div
+                className="first-title"
+                onClick={() => modalContent(task1.id)}
+              >
+                <li>Title: {task1.title}</li>
+                <li>Status: {task1.status}</li>
+                <li>Task number {task1.id}</li>
+                <li>Project {task1.category}</li>
                 <button onClick={() => removeTask(task1.id)}>
                   Delete task
                 </button>
@@ -155,10 +149,10 @@ export default function TaskList({ task, setModal, isModalOpen }) {
           {tasks.map((taskItem) => {
             const { category, status, title, id } = taskItem;
             return category === tabname && status === `done` ? (
-              <div className="first-title" onClick={() => modalContent(id)}>
+              <div onClick={() => modalContent(id)} className="first-title">
                 {" "}
-                <li onClick={() => modalContent(id)}>Title: {title}</li>
-                <li onClick={() => modalContent(id)}>Status: {category}</li>
+                <li>Title: {title}</li>
+                <li>Status: {category}</li>
                 <li>Task number {id}</li>
                 <li>Project {category}</li>
                 <button onClick={() => removeTask(id)}>Delete task</button>

@@ -19,7 +19,7 @@ export default function Addtask({ records, setAddnewtask, tasks, tabname }) {
         title: title,
         description: description,
         status: `todo`,
-        priority: priority,
+        priority: `low`,
         userID: user.uid,
       });
     }
