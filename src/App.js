@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import TaskList from "./Components/taskList";
 import Boards from "./Components/boards";
 import { auth } from "./firebase-conf/index";
-// import OneTask from "./Components/oneTask";
+// import OneTask from "./Components/oneTask"; call site compile time, runtime execution context, web api, callback queq, call stack , global execution context, microtask, macrotask
 import RegistrationForm from "./Components/RegistrationForm";
 import Logout from "./Components/Logout";
 import { onAuthStateChanged } from "firebase/auth";
